@@ -477,3 +477,4 @@ onboarding:
         server: "nfs-server"  # Ip address of nfs server.
   variables:
     push_reports_to_s3: true
+    mosipid: false
