@@ -426,17 +426,36 @@ onboard_mimoto_oidc_partner(){
 	root_ca_cert=$(awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' $root_cert_path)
 	partner_cert=$(awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' $client_cert_path)
 	sh $MYDIR/certs/convert.sh $MYDIR
-	mv $MYDIR/certs/$PARTNER_KC_USERNAME/keystore.p12 $MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12
 
-	kubectl -n $ns_mimoto create secret generic mimotooidc --from-file=$MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12 --dry-run=client -o yaml | kubectl apply -f -
+  # Check if the keystore secret already exists
+  keystore_exists=$(kubectl get secret issueroidc -n $ns_mimoto --ignore-not-found)
 
-	if [ $? -gt 0 ]; then
-      echo "JWK Key generation failed; EXITING";
-      exit 1;
-    fi
-    echo "JWK Keys generated successfully"
-    jwk_key=$(awk -F'"' '/"n"/ {print $8}' $MYDIR/certs/$PARTNER_KC_USERNAME/publickey.jwk)
-	echo $jwk_key
+  if [ -n "$keystore_exists" ]; then
+  echo "keystore already exists. Downloading it."
+
+  # Download existing keystore
+  kubectl get secret issueroidc -n $ns_mimoto -o json | jq -r '.data["oidckeystore.p12"]' | base64 -d > "$MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12"
+
+  # Retrieve the password from the Kubernetes secret
+  password=$( printenv mimoto_oidc_keystore_password )
+  # Import into the keystore with keytool
+  keytool -importkeystore \
+    -srckeystore "$MYDIR/certs/$PARTNER_KC_USERNAME/keystore.p12" -srcstoretype PKCS12 \
+    -destkeystore "$MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12" -deststoretype PKCS12 \
+    -srcalias "$PARTNER_KC_USERNAME" -destalias "esignet-sunbird-partner" \
+    -srcstorepass "$password" -deststorepass "$password" \
+    -noprompt
+
+  # Update the Kubernetes secret with the new keystore file
+  kubectl create secret generic issueroidc --from-file=oidckeystore.p12="$MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12" -n $ns_mimoto --dry-run=client -o yaml | kubectl apply -f -
+
+  else
+  echo "keystore does not exist. Creating a new one."
+  mv $MYDIR/certs/$PARTNER_KC_USERNAME/keystore.p12 $MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12
+  kubectl create secret generic issueroidc --from-file=oidckeystore.p12="$MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12" -n $ns_mimoto --dry-run=client -o yaml | kubectl apply -f -
+fi
+
+
 	newman run onboarding.postman_collection.json --delay-request 2000 -e onboarding.postman_environment.json --bail \
   --env-var url="$URL" \
   --env-var request-time="$DATE" \
@@ -530,8 +549,6 @@ onboard_esignet_sunbird_partner(){
 	root_ca_cert=$(awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' $root_cert_path)
 	partner_cert=$(awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' $client_cert_path)
 	sh $MYDIR/certs/convert.sh $MYDIR
-  mv $MYDIR/certs/$PARTNER_KC_USERNAME/keystore.p12 $MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12
-	kubectl -n $ns_mimoto create secret generic sunbirdoidc --from-file=$MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12 --dry-run=client -o yaml | kubectl apply -f -
 
 	if [ $? -gt 0 ]; then
       echo "JWK Key generation failed; EXITING";
@@ -539,7 +556,32 @@ onboard_esignet_sunbird_partner(){
     fi
     echo "JWK Keys generated successfully"
     jwk_key=$(awk -F'"' '/"n"/ {print $8}' $MYDIR/certs/$PARTNER_KC_USERNAME/publickey.jwk)
+  keystore_exists=$(kubectl get secret issueroidc -n $ns_mimoto --ignore-not-found)
 
+  if [ -n "$keystore_exists" ]; then
+  echo "keystore already exists. Downloading it."
+
+  # Download existing keystore
+  kubectl get secret issueroidc -n $ns_mimoto -o json | jq -r '.data["oidckeystore.p12"]' | base64 -d > "$MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12"
+
+  # Retrieve the password from the Kubernetes secret
+  password=$( printenv mimoto_oidc_keystore_password )
+  # Import into the keystore with keytool
+  keytool -importkeystore \
+    -srckeystore "$MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12" -srcstoretype PKCS12 \
+    -destkeystore "$MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12" -deststoretype PKCS12 \
+    -srcalias "$PARTNER_KC_USERNAME" -destalias "mpartner-default-mimotooidc" \
+    -srcstorepass "$password" -deststorepass "$password" \
+    -noprompt
+
+  # Update the Kubernetes secret with the new keystore file
+  kubectl -n $ns_mimoto create secret generic issueroidc --from-file=oidckeystore.p12="$MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12" -n $ns_mimoto --dry-run=client -o yaml | kubectl apply -f -
+
+  else
+  echo "keystore does not exist. Creating a new one."
+  mv $MYDIR/certs/$PARTNER_KC_USERNAME/keystore.p12 $MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12
+	kubectl -n $ns_mimoto create secret generic issueroidc --from-file=$MYDIR/certs/$PARTNER_KC_USERNAME/oidckeystore.p12 --dry-run=client -o yaml | kubectl apply -f -
+  fi
 	newman run onboarding.postman_collection.json --delay-request 2000 -e onboarding.postman_environment.json --bail \
     --env-var url="$URL" \
     --env-var sunbird-url=$SUNBIRD_URL \
@@ -695,6 +737,7 @@ elif [ "$MODULE" = "resident-oidc" ]; then
   OIDC_CLIENT_NAME='mosip-signup-oauth-client'
   OIDC_CLIENTID='mosip-signup-oauth-client'
   export PARTNER_KC_USERNAME=mosip-signup-oauth-client
+  export KEYSTORE_PASSWORD=$( printenv mimoto_oidc_keystore_password )
   root_cert_path="$MYDIR/certs/$PARTNER_KC_USERNAME/RootCA.pem"
   client_cert_path="$MYDIR/certs/$PARTNER_KC_USERNAME/Client.pem"
   LOGO_URI="https://healthservices.$( printenv installation-domain)/images/brand_logo.png"
@@ -707,6 +750,7 @@ elif [ "$MODULE" = "resident-oidc" ]; then
   OIDC_CLIENT_NAME='esignet-sunbird-partner'
   OIDC_CLIENTID='esignet-sunbird-partner'
   export PARTNER_KC_USERNAME=esignet-sunbird-partner
+  export KEYSTORE_PASSWORD=$( printenv mimoto_oidc_keystore_password )
   root_cert_path="$MYDIR/certs/$PARTNER_KC_USERNAME/RootCA.pem"
   client_cert_path="$MYDIR/certs/$PARTNER_KC_USERNAME/Client.pem"
   LOGO_URI="https://sunbird.org/images/sunbird-logo-new.png"
