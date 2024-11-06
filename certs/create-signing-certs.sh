@@ -28,7 +28,7 @@ locality=Blr
 orgnisation=IITB
 email_id=user_$(date +%s%N)@example.com
 common_name=$partner_name
-keystore_password=mosip123
+keystore_password=$( printenv KEYSTORE_PASSWORD )
 export keystore_password
 echo "$keystore_password" > key.pwd
 
