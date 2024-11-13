@@ -26,7 +26,7 @@ jobs:
     env:
       SERVICE_NAME: partner-onboarder
       VERSION: ${{ github.event.number || 'latest' }}
-      SERVICE_LOCATION: '.'  # Adjust if needed
+      SERVICE_LOCATION: '.'  
 
     steps:
       - name: Checkout code
@@ -38,7 +38,7 @@ jobs:
           docker build . --file Dockerfile --tag ${{ env.SERVICE_NAME }}:${{ env.VERSION }}
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@v0.20.0
+        uses: aquasecurity/trivy-action@0.20.0
         with:
           image-ref: '${{ env.SERVICE_NAME }}:${{ env.VERSION }}'
           format: 'sarif'
