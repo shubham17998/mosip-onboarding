@@ -24,9 +24,9 @@ jobs:
   trivy-scan:
     runs-on: ubuntu-latest
     env:
-      NAMESPACE: ${{ secrets.dev_namespace_docker_hub }}
       SERVICE_NAME: partner-onboarder
-      VERSION: latest  # Modify this as needed or set dynamically based on your versioning scheme
+      VERSION: ${{ github.event.number || 'latest' }}  # Use PR number for uniqueness, fallback to 'latest'
+      SERVICE_LOCATION: '.'  # Set your service location if not root directory
 
     steps:
       - name: Checkout code
@@ -38,20 +38,13 @@ jobs:
           docker build . --file Dockerfile --tag ${{ env.SERVICE_NAME }}:${{ env.VERSION }}
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.20.0
+        uses: aquasecurity/trivy-action@v0.20.0
         with:
-          image-ref: 'docker.io/${{ env.SERVICE_NAME }}:${{ env.VERSION }}'
+          image-ref: '${{ env.SERVICE_NAME }}:${{ env.VERSION }}'
           format: 'sarif'
           output: 'trivy-results.sarif'
-          
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'trivy-results.sarif'
-
-
-     # - name: Post Trivy scan results as PR comment
-      #  uses: marocchino/sticky-pull-request-comment@v2
-       # with:
-        #  path: trivy-results.sarif
