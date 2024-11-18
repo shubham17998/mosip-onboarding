@@ -1,0 +1,55 @@
+name: Trivy Scan
+
+on:
+  push:
+    branches:
+      - main
+      - 'release-1*'
+      - develop
+      - '1.2.*'
+      - master
+      - test
+      - MOSIP-35889
+  pull_request:
+    branches:
+      - main
+      - 'release-1*'
+      - develop
+      - '1.2.*'
+      - master
+      - test
+      - MOSIP-35889
+      - MOSIP-35987
+
+jobs:
+  trivy-scan:
+    runs-on: ubuntu-latest
+    env:
+      SERVICE_NAME: partner-onboarder
+      VERSION: ${{ github.event.number || 'latest' }}
+      SERVICE_LOCATION: '.'  # Adjust if needed
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: |
+          cd "${{ env.SERVICE_LOCATION }}"
+          docker build . --file Dockerfile --tag ${{ env.SERVICE_NAME }}:${{ env.VERSION }}
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: '${{ env.SERVICE_NAME }}:${{ env.VERSION }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'HIGH,CRITICAL'
+          ignore-unfixed: true
+          exit-code: 1  # Fail the job if vulnerabilities found
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+        if: always()  # Ensure this step runs even if the previous step fails
