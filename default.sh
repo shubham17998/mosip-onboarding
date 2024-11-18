@@ -296,6 +296,7 @@ onboard_mock_relying_party_with_mock_rp_oidc_client(){
 	--env-var ca-certificate="$root_ca_cert" \
 	--env-var leaf-certificate="$partner_cert" \
 	--env-var oidc-client-name="$OIDC_CLIENT_NAME" \
+	--env-var oidc-clientid="$OIDC_CLIENTID" \
 	--folder 'create_keycloak_user' \
 	--folder 'create/publish_policy_group_and_policy' \
 	--folder partner-self-registration \
@@ -307,6 +308,7 @@ onboard_mock_relying_party_with_mock_rp_oidc_client(){
 	--folder approve-partner-mapping-to-policy \
 	--folder get-jwks \
 	--folder create-oidc-client \
+	--folder create-oidc-client-through-esignet \
 	--folder delete-user \
     $ADD_SSL_NEWMAN \
     --export-environment ./config-secrets.json -d ./default-mock-rp-oidc-policy.json -r cli,htmlextra --reporter-htmlextra-export "$reports_dir/mock-rp-oidc.html" --reporter-htmlextra-showEnvironmentData
@@ -517,7 +519,7 @@ onboard_esignet_signup_oidc_partner(){
 	--env-var oidc-clientid="$OIDC_CLIENTID" \
 	--folder 'create_keycloak_user' \
 	--folder authenticate-to-upload-certs \
-	--folder create-oidc-client-through-esignet \
+	--folder create-oidc-client-through-esignet-signup \
 	--folder delete-user \
     $ADD_SSL_NEWMAN \
   --export-environment ./config-secrets.json  -r cli,htmlextra --reporter-htmlextra-export "$reports_dir/signup-oidc.html" --reporter-htmlextra-showEnvironmentData
@@ -635,6 +637,7 @@ elif [ "$MODULE" = "mock-rp-oidc" ]; then
   PARTNER_ORGANIZATION_NAME=IITB
   PARTNER_TYPE=Auth_Partner
   OIDC_CLIENT_NAME='Health service OIDC Client'
+  OIDC_CLIENTID='default-non-mosipid-oidc-client'
   LOGO_URI=https://healthservices.$( printenv installation-domain)/logo.png
   REDIRECT_URIS=https://healthservices.$( printenv installation-domain)/userprofile
   root_cert_path="$MYDIR/certs/$PARTNER_KC_USERNAME/RootCA.pem"
