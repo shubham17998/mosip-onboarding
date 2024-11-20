@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "34cbd0af-238b-49a8-b10f-dcfd373b5042",
+		"_postman_id": "863ca8cb-6596-4c39-b0b2-e2ae80d5301d",
 		"name": "onboarding Copy",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "12620596"
@@ -319,8 +319,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"if (pm.environment.get(\"mosip-id\") == 'false' ){\r",
-									"    pm.execution.skipRequest()\r",
+									"if (pm.environment.get(\"mosip-id\") == 'false' ){console.log(\"This request is skipped as eSignet is not deployed against MosipID\");\r",
+									"\r",
+									"    pm.execution.skipRequest()\r",
 									"}"
 								],
 								"type": "text/javascript",
@@ -391,8 +392,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"if (pm.environment.get(\"mosip-id\") == 'false' ){\r",
-									"    pm.execution.skipRequest()\r",
+									"if (pm.environment.get(\"mosip-id\") == 'false' ){console.log(\"This request is skipped as eSignet is not deployed against MosipID\");\r",
+									"\r",
+									"    pm.execution.skipRequest()\r",
 									"}"
 								],
 								"type": "text/javascript",
@@ -458,8 +460,9 @@
 									"const policydata = pm.iterationData.toObject();\r",
 									"console.log(JSON.stringify(policydata));\r",
 									"pm.environment.set('policy-data', JSON.stringify(policydata));\r",
-									"if (pm.environment.get(\"mosip-id\") == 'false' ){\r",
-									"    pm.execution.skipRequest()\r",
+									"if (pm.environment.get(\"mosip-id\") == 'false' ){console.log(\"This request is skipped as eSignet is not deployed against MosipID\");\r",
+									"\r",
+									"    pm.execution.skipRequest()\r",
 									"}\r",
 									""
 								],
@@ -538,8 +541,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"if (pm.environment.get(\"mosip-id\") == 'false' ){\r",
-									"    pm.execution.skipRequest()\r",
+									"if (pm.environment.get(\"mosip-id\") == 'false' ){console.log(\"This request is skipped as eSignet is not deployed against MosipID\");\r",
+									"\r",
+									"    pm.execution.skipRequest()\r",
 									"}"
 								],
 								"type": "text/javascript",
@@ -600,8 +604,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"if (pm.environment.get(\"mosip-id\") == 'false' ){\r",
-									"    pm.execution.skipRequest()\r",
+									"if (pm.environment.get(\"mosip-id\") == 'false' ){console.log(\"This request is skipped as eSignet is not deployed against MosipID\");\r",
+									"\r",
+									"    pm.execution.skipRequest()\r",
 									"}"
 								],
 								"type": "text/javascript",
@@ -658,8 +663,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"if (pm.environment.get(\"mosip-id\") == 'false' ){\r",
-									"    pm.execution.skipRequest()\r",
+									"if (pm.environment.get(\"mosip-id\") == 'false' ){console.log(\"This request is skipped as eSignet is not deployed against MosipID\");\r",
+									"\r",
+									"    pm.execution.skipRequest()\r",
 									"}"
 								],
 								"type": "text/javascript",
@@ -759,16 +765,18 @@
 									"    pm.expect(pm.response.text()).to.include(\"Clientid and Token combination had been validated successfully\");\r",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						},
 						{
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.environment.set('request-time',  (new Date()).toISOString())"
+									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -810,16 +818,18 @@
 									"    pm.expect(pm.response.text()).to.include(\"Clientid and Token combination had been validated successfully\");\r",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						},
 						{
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.environment.set('request-time',  (new Date()).toISOString())"
+									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1379,8 +1389,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"if (pm.environment.get(\"mosip-id\") == 'false' ){\r",
-									"    pm.execution.skipRequest()\r",
+									"if (pm.environment.get(\"mosip-id\") == 'false' ){console.log(\"This request is skipped as eSignet is not deployed against MosipID\");\r",
+									"\r",
+									"    pm.execution.skipRequest()\r",
 									"}"
 								],
 								"type": "text/javascript",
@@ -1554,8 +1565,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"if (pm.environment.get(\"mosip-id\") == 'false' ){\r",
-									"    pm.execution.skipRequest()\r",
+									"if (pm.environment.get(\"mosip-id\") == 'false' ){console.log(\"This request is skipped as eSignet is not deployed against MosipID\");\r",
+									"\r",
+									"    pm.execution.skipRequest()\r",
 									"}"
 								],
 								"type": "text/javascript",
@@ -1867,8 +1879,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"if (pm.environment.get(\"mosip-id\") == 'false' ){\r",
-									"    pm.execution.skipRequest()\r",
+									"if (pm.environment.get(\"mosip-id\") == 'false' ){console.log(\"This request is skipped as eSignet is not deployed against MosipID\");\r",
+									"\r",
+									"    pm.execution.skipRequest()\r",
 									"}"
 								],
 								"type": "text/javascript",
@@ -2076,8 +2089,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"if (pm.environment.get(\"mosip-id\") == 'false' ){\r",
-									"    pm.execution.skipRequest()\r",
+									"if (pm.environment.get(\"mosip-id\") == 'false' ){console.log(\"This request is skipped as eSignet is not deployed against MosipID\");\r",
+									"\r",
+									"    pm.execution.skipRequest()\r",
 									"}"
 								],
 								"type": "text/javascript",
@@ -2262,8 +2276,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"if (pm.environment.get(\"mosip-id\") == 'false' ){\r",
-									"    pm.execution.skipRequest()\r",
+									"if (pm.environment.get(\"mosip-id\") == 'false' ){console.log(\"This request is skipped as eSignet is not deployed against MosipID\");\r",
+									"\r",
+									"    pm.execution.skipRequest()\r",
 									"}"
 								],
 								"type": "text/javascript",
@@ -2601,8 +2616,9 @@
 									"    console.error(\"Environment variable 'redirect-uris' is not defined.\");\r",
 									"    pm.environment.set(\"redirect_uris_array\", \"[]\");\r",
 									"}\r",
-									"if (pm.environment.get(\"mosip-id\") == 'false' ){\r",
-									"    pm.execution.skipRequest()\r",
+									"if (pm.environment.get(\"mosip-id\") == 'false' ){console.log(\"This request is skipped as eSignet is not deployed against MosipID\");\r",
+									"\r",
+									"    pm.execution.skipRequest()\r",
 									"}\r",
 									""
 								],
