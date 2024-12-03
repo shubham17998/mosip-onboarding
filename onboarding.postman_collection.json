@@ -3250,6 +3250,21 @@
 				},
 				{
 					"name": "delete-user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"if (pm.environment.get(\"mosip-id\") == 'false' ){console.log(\"This request is skipped as eSignet is not deployed against MosipID\");\r",
+									"\r",
+									"    pm.execution.skipRequest()\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
