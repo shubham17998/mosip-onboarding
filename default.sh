@@ -301,6 +301,7 @@ onboard_mock_relying_party_with_mock_rp_oidc_client(){
 	--folder 'create/publish_policy_group_and_policy' \
 	--folder partner-self-registration \
 	--folder authenticate-to-upload-certs \
+	--folder authenticate-to-onboard-non-mosipid-client \
     --folder upload-ca-certificate \
     --folder upload-leaf-certificate \
     --folder activate-partner \
